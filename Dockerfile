@@ -1,11 +1,12 @@
 FROM node:20-bookworm-slim as builder
 
 WORKDIR /app
-COPY package*.json ./
+# Copiamos solo package.json para evitar usar un package-lock generado en otra plataforma (macOS),
+# lo que puede romper la resolución de dependencias opcionales (Rollup nativo) en Linux
+COPY package.json ./
 
-# Instala TODAS las dependencias (incluye dev) de forma reproducible
-# En Debian/Bookworm evitamos el problema de binarios nativos de Rollup en Alpine (musl)
-RUN npm ci
+# Instala dependencias (incluye dev); permite resolver opcionales por plataforma correctamente
+RUN npm install
 
 COPY . .
 RUN npm run build

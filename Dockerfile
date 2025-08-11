@@ -3,9 +3,9 @@ FROM node:20-alpine as builder
 WORKDIR /app
 COPY package*.json ./
 
-# Instala TODAS las dependencias (incluye dev), necesarias para vite
-# Evita flags como --only=production que rompen el build
-RUN npm ci
+# Instala TODAS las dependencias (incluye dev) necesarias para Vite/Rollup
+# Usamos `npm install` en lugar de `npm ci` para evitar un bug con dependencias opcionales de Rollup en Alpine/musl
+RUN npm install
 
 COPY . .
 RUN npm run build

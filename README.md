@@ -43,12 +43,14 @@ Portal web profesional para la gestión de clínicas dentales con integración a
 
 1. Crea una base en Airtable con las tablas mencionadas
 2. Obtén tu Base ID y API Key desde Airtable
-3. Copia `.env.example` a `.env` y completa las variables:
+3. Copia `.env.example` a `.env` y completa las variables (prefijo VITE_):
 
 ```env
-REACT_APP_AIRTABLE_BASE_ID=tu_base_id_aqui
-REACT_APP_AIRTABLE_API_KEY=tu_api_key_aqui
+VITE_AIRTABLE_BASE_ID=tu_base_id_aqui
+VITE_AIRTABLE_API_KEY=tu_api_key_aqui
 ```
+
+Nota: Si despliegas en DigitalOcean App Platform, define estas variables en el panel como VITE_AIRTABLE_BASE_ID y VITE_AIRTABLE_API_KEY para que Vite las inyecte en el build.
 
 ## Instalación y Uso
 

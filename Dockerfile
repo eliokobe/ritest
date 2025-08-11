@@ -1,16 +1,16 @@
-FROM node:20-alpine as builder
+FROM node:20-bookworm-slim as builder
 
 WORKDIR /app
 COPY package*.json ./
 
-# Instala TODAS las dependencias (incluye dev) necesarias para Vite/Rollup
-# Usamos `npm install` en lugar de `npm ci` para evitar un bug con dependencias opcionales de Rollup en Alpine/musl
-RUN npm install
+# Instala TODAS las dependencias (incluye dev) de forma reproducible
+# En Debian/Bookworm evitamos el problema de binarios nativos de Rollup en Alpine (musl)
+RUN npm ci
 
 COPY . .
 RUN npm run build
 
-FROM nginx:alpine
+FROM nginx:stable-bookworm
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Nginx config básica SPA

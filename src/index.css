@@ -1,10 +1,51 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @layer components {
-  .card { @apply bg-white rounded-xl shadow-sm border border-gray-200; }
-  .btn-primary { @apply bg-[#0059F1] hover:bg-[#003CB8] text-white rounded-full font-medium focus:ring-2 focus:ring-[#0059F1] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed; }
-  .btn-secondary { @apply border rounded-full text-gray-700 hover:bg-gray-50; }
-  .input { @apply w-full border border-gray-300 rounded-full px-4 py-2 focus:ring-2 focus:ring-[#0059F1] focus:border-transparent; }
+  .card {
+    background-color: #fff;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    border-width: 1px;
+    border-color: #e5e7eb;
+  }
+  .btn-primary {
+    background-color: #0059F1;
+    color: #fff;
+    border-radius: 9999px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+  }
+  .btn-primary:hover {
+    background-color: #003CB8;
+  }
+  .btn-primary:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #0059F1;
+  }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .btn-secondary {
+    border: 1px solid #d1d5db;
+    border-radius: 9999px;
+    color: #374151;
+    background-color: transparent;
+    transition: background-color 0.2s;
+  }
+  .btn-secondary:hover {
+    background-color: #f9fafb;
+  }
+  .input {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 9999px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  .input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #0059F1;
+    border-color: transparent;
+  }
 }

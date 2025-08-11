@@ -1,0 +1,24 @@
+name: sonrisia-portal
+services:
+- name: web
+  source_dir: /
+  github:
+    repo: tu-usuario/tu-repo
+    branch: main
+  run_command: npm start
+  environment_slug: node-js
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 3000
+  health_check:
+    http_path: /
+  envs:
+  - key: REACT_APP_AIRTABLE_BASE_ID
+    scope: RUN_TIME
+    type: SECRET
+  - key: REACT_APP_AIRTABLE_API_KEY
+    scope: RUN_TIME
+    type: SECRET
+  - key: NODE_ENV
+    scope: RUN_TIME
+    value: production

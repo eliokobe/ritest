@@ -4,6 +4,8 @@ import { User, Task, Invoice, DashboardStats } from '../types';
 
 const AIRTABLE_BASE_ID = import.meta.env.VITE_AIRTABLE_BASE_ID || 'your-base-id';
 const AIRTABLE_API_KEY = import.meta.env.VITE_AIRTABLE_API_KEY || 'your-api-key';
+// Nombre de la tabla de clientes. Se puede sobreescribir con VITE_AIRTABLE_TABLE, pero por defecto es 'Clientes'
+const AIRTABLE_CLIENTS_TABLE = import.meta.env.VITE_AIRTABLE_TABLE || 'Clientes';
 
 const airtableApi = axios.create({
   baseURL: `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}`,
@@ -58,7 +60,7 @@ export const airtableService = {
   // Autenticación
   async authenticateUser(email: string, password: string): Promise<User | null> {
     try {
-      const response = await airtableApi.get('/Clientes', {
+  const response = await airtableApi.get(`/${AIRTABLE_CLIENTS_TABLE}`, {
         params: {
           filterByFormula: `AND({Email} = '${email}', {Password} = '${password}')`,
         },
@@ -94,7 +96,7 @@ export const airtableService = {
   // Obtener URL del logo del cliente por ID
   async getClientLogo(clientId: string): Promise<string | undefined> {
     try {
-      const { data } = await airtableApi.get(`/Clientes/${clientId}`);
+  const { data } = await airtableApi.get(`/${AIRTABLE_CLIENTS_TABLE}/${clientId}`);
       const fields = (data as any)?.fields ?? {};
       const logoField = fields.Logo;
       if (Array.isArray(logoField) && logoField.length > 0 && logoField[0]?.url) {
@@ -276,7 +278,7 @@ export const airtableService = {
     if (userData.phone !== undefined) fields['Teléfono'] = userData.phone;
     if (userData.clinic !== undefined) fields['Clínica'] = userData.clinic;
     try {
-      await airtableApi.patch(`/Clientes/${userId}`, { fields });
+  await airtableApi.patch(`/${AIRTABLE_CLIENTS_TABLE}/${userId}`, { fields });
     } catch (error) {
       console.error('Error updating user:', error);
       throw error;

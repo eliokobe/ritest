@@ -1,12 +1,20 @@
 FROM node:20-bookworm-slim as builder
 
 WORKDIR /app
+
+# Actualizamos npm a una versión donde el bug de dependencias opcionales de Rollup está mitigado
+RUN npm install -g npm@11.5.2
+
 # Copiamos manifiestos para instalación determinística
 COPY package.json package-lock.json ./
 
-# Instalación (no usamos npm ci por bug con dependencias opcionales de Rollup en CI: @rollup/rollup-linux-x64-gnu)
-# Referencia: https://github.com/npm/cli/issues/4828
-RUN npm install && npm rebuild rollup || true
+# Intentamos instalación determinística; si por alguna razón falla, fallback a npm install
+RUN npm ci || npm install
+
+# Verificación / instalación forzada del binario nativo de Rollup para linux-x64 (workaround bug npm cli #4828)
+RUN node -e "try{require('@rollup/rollup-linux-x64-gnu');console.log('Rollup native binary present')}catch(e){console.log('Missing rollup native binary, installing...');process.exit(1)}" \
+ || npm install @rollup/rollup-linux-x64-gnu@4.24.0 --no-save \
+ && node -e "require('@rollup/rollup-linux-x64-gnu');console.log('Rollup native binary installed OK')"
 
 COPY . .
 RUN npm run build

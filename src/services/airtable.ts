@@ -2,10 +2,20 @@
 import axios from 'axios';
 import { User, Task, Invoice, DashboardStats } from '../types';
 
-const AIRTABLE_BASE_ID = import.meta.env.VITE_AIRTABLE_BASE_ID || 'your-base-id';
+// Base ID fijo (no es secreto). Si se define VITE_AIRTABLE_BASE_ID la sobreescribe.
+const AIRTABLE_BASE_ID = import.meta.env.VITE_AIRTABLE_BASE_ID || 'appRMClMob8KPNooU';
+// API Key solo por variable de entorno (no hardcodear). Placeholder si falta.
 const AIRTABLE_API_KEY = import.meta.env.VITE_AIRTABLE_API_KEY || 'your-api-key';
 // Nombre de la tabla de clientes. Se puede sobreescribir con VITE_AIRTABLE_TABLE, pero por defecto es 'Clientes'
 const AIRTABLE_CLIENTS_TABLE = import.meta.env.VITE_AIRTABLE_TABLE || 'Clientes';
+
+if (AIRTABLE_BASE_ID === 'your-base-id') {
+  // Build sin sustituir env -> avisamos en runtime
+  console.error('[Airtable] Falta VITE_AIRTABLE_BASE_ID en build; usando placeholder');
+}
+if (AIRTABLE_API_KEY === 'your-api-key') {
+  console.error('[Airtable] Falta VITE_AIRTABLE_API_KEY (no habrá acceso a Airtable)');
+}
 
 const airtableApi = axios.create({
   baseURL: `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}`,

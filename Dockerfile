@@ -2,6 +2,13 @@ FROM node:20-bookworm-slim as builder
 
 WORKDIR /app
 
+# --- Añadir estas 4 líneas ---
+ARG VITE_AIRTABLE_BASE_ID
+ARG VITE_AIRTABLE_API_KEY
+ENV VITE_AIRTABLE_BASE_ID=$VITE_AIRTABLE_BASE_ID
+ENV VITE_AIRTABLE_API_KEY=$VITE_AIRTABLE_API_KEY
+# ------------------------------
+
 # Actualizamos npm a una versión donde el bug de dependencias opcionales de Rollup está mitigado
 RUN npm install -g npm@11.5.2
 

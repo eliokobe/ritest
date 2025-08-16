@@ -1,12 +1,11 @@
 FROM node:20-bookworm-slim as builder
 
 WORKDIR /app
-# Copiamos solo package.json para evitar usar un package-lock generado en otra plataforma (macOS),
-# lo que puede romper la resolución de dependencias opcionales (Rollup nativo) en Linux
-COPY package.json ./
+# Copiamos manifiestos para instalación determinística
+COPY package.json package-lock.json ./
 
-# Instala dependencias (incluye dev); permite resolver opcionales por plataforma correctamente
-RUN npm install
+# Instalación reproducible con lockfile (incluye devDependencies para Vite)
+RUN npm ci
 
 COPY . .
 RUN npm run build

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { PhoneCall, Calendar, PlayCircle } from 'lucide-react';
+import { PhoneCall, Calendar /*, PlayCircle */ } from 'lucide-react';
 import { airtableService } from '../services/airtable';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -98,7 +98,7 @@ const Calls: React.FC = () => {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full border border-gray-300 rounded-full px-3 py-2 text-sm"
+              className="w-full border border-gray-300 rounded-full px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0059F1]/30"
             >
               <option value="">Todos</option>
               {statuses.map(s => (
@@ -174,14 +174,16 @@ const Calls: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {c.recordingUrl ? (
-                        <a
-                          href={c.recordingUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center text-[#0059F1] hover:underline"
-                        >
-                          <PlayCircle className="h-5 w-5 mr-1" /> Escuchar
-                        </a>
+                        <div className="w-56 sm:w-64 md:w-72 lg:w-80">
+                          <audio
+                            controls
+                            preload="none"
+                            className="w-full h-9 [&::-webkit-media-controls-panel]:bg-gray-100 [&::-webkit-media-controls-panel]:rounded-full [&::-webkit-media-controls-enclosure]:rounded-full"
+                            src={c.recordingUrl}
+                          >
+                            Tu navegador no soporta audio.
+                          </audio>
+                        </div>
                       ) : (
                         <span className="text-sm text-gray-400">—</span>
                       )}

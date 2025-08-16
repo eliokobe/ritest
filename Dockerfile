@@ -4,8 +4,9 @@ WORKDIR /app
 # Copiamos manifiestos para instalación determinística
 COPY package.json package-lock.json ./
 
-# Instalación reproducible con lockfile (incluye devDependencies para Vite)
-RUN npm ci
+# Instalación (no usamos npm ci por bug con dependencias opcionales de Rollup en CI: @rollup/rollup-linux-x64-gnu)
+# Referencia: https://github.com/npm/cli/issues/4828
+RUN npm install && npm rebuild rollup || true
 
 COPY . .
 RUN npm run build

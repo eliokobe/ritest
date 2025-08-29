@@ -119,7 +119,7 @@ const Support: React.FC = () => {
                 <Phone className="h-5 w-5 text-gray-600" />
                 <div>
                   <p className="text-sm font-medium text-gray-900">Teléfono</p>
-                  <p className="text-sm text-gray-700">+34 900 123 456</p>
+                  <p className="text-sm text-gray-700">+34 600 997 778</p>
                   <p className="text-xs text-gray-500">Lunes a Viernes 9:00-18:00</p>
                 </div>
               </div>

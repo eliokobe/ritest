@@ -60,7 +60,7 @@ const Settings: React.FC = () => {
             {!isEditing ? (
               <button
                 onClick={() => setIsEditing(true)}
-                className="flex items-center px-4 py-2 text-sm font-medium text-[#0059F1] hover:bg-blue-50 rounded-full transition-colors"
+                className="flex items-center px-4 py-2 text-sm font-medium text-brand-primary hover:bg-green-50 rounded-full transition-colors"
               >
                 <Edit3 className="h-4 w-4 mr-2" />
                 Editar

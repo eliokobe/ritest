@@ -6,8 +6,8 @@ import { User, Task, Invoice, DashboardStats } from '../types';
 const AIRTABLE_BASE_ID = import.meta.env.VITE_AIRTABLE_BASE_ID || 'appRMClMob8KPNooU';
 // API Key solo por variable de entorno (no hardcodear). Placeholder si falta.
 const AIRTABLE_API_KEY = import.meta.env.VITE_AIRTABLE_API_KEY || 'your-api-key';
-// Nombre de la tabla de clientes. Se puede sobreescribir con VITE_AIRTABLE_TABLE, pero por defecto es 'Clientes'
-const AIRTABLE_CLIENTS_TABLE = import.meta.env.VITE_AIRTABLE_TABLE || 'Clientes';
+// Nombre de la tabla de trabajadores. Se puede sobreescribir con VITE_AIRTABLE_WORKERS_TABLE, pero por defecto es 'Trabajadores'
+const AIRTABLE_WORKERS_TABLE = import.meta.env.VITE_AIRTABLE_WORKERS_TABLE || 'Trabajadores';
 
 if (AIRTABLE_BASE_ID === 'your-base-id') {
   // Build sin sustituir env -> avisamos en runtime
@@ -70,9 +70,9 @@ export const airtableService = {
   // Autenticación
   async authenticateUser(email: string, password: string): Promise<User | null> {
     try {
-  const response = await airtableApi.get(`/${AIRTABLE_CLIENTS_TABLE}`, {
+      const response = await airtableApi.get(`/${AIRTABLE_WORKERS_TABLE}`, {
         params: {
-          filterByFormula: `AND({Email} = '${email}', {Password} = '${password}')`,
+          filterByFormula: `AND({Email} = '${email}', {Contraseña} = '${password}')`,
         },
       });
 
@@ -89,10 +89,10 @@ export const airtableService = {
         return {
           id: record.id,
           email: record.fields.Email,
-          name: record.fields.Name,
-          phone: record.fields.Phone,
-          clinic: record.fields.Clinic,
-          role: record.fields.Role,
+          name: record.fields.Nombre || record.fields.Name,
+          phone: record.fields.Teléfono || record.fields.Phone,
+          clinic: record.fields.Empresa || record.fields.Clinic,
+          role: record.fields.Cargo || record.fields.Role,
           logoUrl,
         };
       }
@@ -103,10 +103,10 @@ export const airtableService = {
     }
   },
 
-  // Obtener URL del logo del cliente por ID
-  async getClientLogo(clientId: string): Promise<string | undefined> {
+  // Obtener URL del logo del trabajador por ID
+  async getClientLogo(workerId: string): Promise<string | undefined> {
     try {
-  const { data } = await airtableApi.get(`/${AIRTABLE_CLIENTS_TABLE}/${clientId}`);
+      const { data } = await airtableApi.get(`/${AIRTABLE_WORKERS_TABLE}/${workerId}`);
       const fields = (data as any)?.fields ?? {};
       const logoField = fields.Logo;
       if (Array.isArray(logoField) && logoField.length > 0 && logoField[0]?.url) {
@@ -114,38 +114,68 @@ export const airtableService = {
       }
       return undefined;
     } catch (error) {
-      console.error('Error fetching client logo:', error);
+      console.error('Error fetching worker logo:', error);
       return undefined;
     }
   },
 
-  // Obtener estadísticas del dashboard (desde tabla Llamadas)
+  // Obtener estadísticas del dashboard (desde tabla Servicios)
   async getDashboardStats(): Promise<DashboardStats> {
     try {
       const now = new Date();
       const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
       const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-      // Traer últimos 30 días desde Airtable
-      const records = await fetchAllRecords('Llamadas', {
-        filterByFormula: "IS_AFTER({Fecha}, DATEADD(TODAY(), -30, 'days'))",
-        pageSize: 100,
-      });
+      // Intentar traer todos los servicios (sin filtro de fecha para ser más compatible)
+      let records: any[] = [];
+      try {
+        records = await fetchAllRecords('Servicios', {
+          pageSize: 100,
+        });
+      } catch (error) {
+        console.warn('No se pudo acceder a la tabla Servicios:', error);
+        // Retornar estadísticas vacías si no existe la tabla
+        const emptyDailyData = [];
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+          emptyDailyData.push({
+            date: d.toISOString().split('T')[0],
+            services: 0,
+            completed: 0,
+          });
+        }
+        return {
+          services30Days: 0,
+          services7Days: 0,
+          servicesCompleted30Days: 0,
+          servicesCompleted7Days: 0,
+          dailyData: emptyDailyData,
+        };
+      }
 
-      // Normalizar
-      type CallRec = { fecha: Date; estado?: string };
-      const calls: CallRec[] = records
-        .map((r: any) => ({
-          fecha: new Date(r.fields?.Fecha),
-          estado: r.fields?.Estado,
-        }))
-        .filter((r: CallRec) => !isNaN(r.fecha.getTime())); // solo fechas válidas
+      // Normalizar - usar múltiples posibles nombres para la fecha
+      type ServiceRec = { fecha: Date; estado?: string };
+      const services: ServiceRec[] = records
+        .map((r: any) => {
+          const fields = r.fields || {};
+          let fechaValue = fields.Fecha || 
+                          fields['Fecha de creación'] || 
+                          fields['Created'] || 
+                          fields['Date'] ||
+                          new Date().toISOString(); // fecha actual como fallback
+          
+          return {
+            fecha: new Date(fechaValue),
+            estado: fields.Estado || fields.Status,
+          };
+        })
+        .filter((r: ServiceRec) => !isNaN(r.fecha.getTime())); // solo fechas válidas
 
       // Acumulados 30/7 días
-      let calls30Days = 0;
-      let calls7Days = 0;
-      let appointments30Days = 0;
-      let appointments7Days = 0;
+      let services30Days = 0;
+      let services7Days = 0;
+      let servicesCompleted30Days = 0;
+      let servicesCompleted7Days = 0;
 
       // Mapa por día (últimos 7 días) para gráficos
       const dayKey = (d: Date) => d.toISOString().split('T')[0];
@@ -154,45 +184,65 @@ export const airtableService = {
         const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
         last7Keys.push(dayKey(d));
       }
-      const byDay = new Map(last7Keys.map(k => [k, { calls: 0, appointments: 0 }]));
+      const byDay = new Map(last7Keys.map(k => [k, { services: 0, completed: 0 }]));
 
-      for (const rec of calls) {
+      for (const rec of services) {
         const is30 = rec.fecha >= thirtyDaysAgo && rec.fecha <= now;
         const is7 = rec.fecha >= sevenDaysAgo && rec.fecha <= now;
-        const isAppointment = rec.estado === 'Cita agendada';
+        const isCompleted = rec.estado?.toLowerCase().includes('completado') || 
+                           rec.estado?.toLowerCase().includes('reparado') ||
+                           rec.estado?.toLowerCase().includes('finished') ||
+                           rec.estado?.toLowerCase().includes('done');
 
         if (is30) {
-          calls30Days++;
-          if (isAppointment) appointments30Days++;
+          services30Days++;
+          if (isCompleted) servicesCompleted30Days++;
         }
         if (is7) {
-          calls7Days++;
-          if (isAppointment) appointments7Days++;
+          services7Days++;
+          if (isCompleted) servicesCompleted7Days++;
           const k = dayKey(rec.fecha);
           if (byDay.has(k)) {
             const agg = byDay.get(k)!;
-            agg.calls += 1;
-            if (isAppointment) agg.appointments += 1;
+            agg.services += 1;
+            if (isCompleted) agg.completed += 1;
           }
         }
       }
 
       const dailyData = last7Keys.map(k => ({
         date: k,
-        calls: byDay.get(k)!.calls,
-        appointments: byDay.get(k)!.appointments,
+        services: byDay.get(k)!.services,
+        completed: byDay.get(k)!.completed,
       }));
 
       return {
-        calls30Days,
-        calls7Days,
-        appointments30Days,
-        appointments7Days,
+        services30Days,
+        services7Days,
+        servicesCompleted30Days,
+        servicesCompleted7Days,
         dailyData,
       };
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
-      throw error;
+      // En caso de error, retornar estadísticas vacías en lugar de fallar
+      const emptyDailyData = [];
+      const now = new Date();
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+        emptyDailyData.push({
+          date: d.toISOString().split('T')[0],
+          services: 0,
+          completed: 0,
+        });
+      }
+      return {
+        services30Days: 0,
+        services7Days: 0,
+        servicesCompleted30Days: 0,
+        servicesCompleted7Days: 0,
+        dailyData: emptyDailyData,
+      };
     }
   },
 
@@ -277,18 +327,17 @@ export const airtableService = {
     }
   },
 
-  // Actualizar usuario
-
-  // Actualizar usuario (campos en español)
+  // Actualizar trabajador (campos en español)
   async updateUser(userId: string, userData: Partial<User>): Promise<void> {
-    // Mapear solo a columnas en español
+    // Mapear a columnas en español de la tabla Trabajadores
     const fields: Record<string, any> = {};
-    if (userData.name !== undefined) fields['Name'] = userData.name;
+    if (userData.name !== undefined) fields['Nombre'] = userData.name;
     if (userData.email !== undefined) fields['Email'] = userData.email;
     if (userData.phone !== undefined) fields['Teléfono'] = userData.phone;
-    if (userData.clinic !== undefined) fields['Clínica'] = userData.clinic;
+    if (userData.clinic !== undefined) fields['Empresa'] = userData.clinic;
+    if (userData.role !== undefined) fields['Cargo'] = userData.role;
     try {
-  await airtableApi.patch(`/${AIRTABLE_CLIENTS_TABLE}/${userId}`, { fields });
+      await airtableApi.patch(`/${AIRTABLE_WORKERS_TABLE}/${userId}`, { fields });
     } catch (error) {
       console.error('Error updating user:', error);
       throw error;
@@ -407,12 +456,117 @@ export const airtableService = {
     }
   },
 
+  // Obtener servicios (tabla "Servicios")
+  async getServices(clinic?: string): Promise<{
+    id: string;
+    expediente?: string;
+    cliente?: string;
+    telefono?: string;
+    estado?: string;
+    comentarios?: string;
+    tecnico?: string;
+    fotoReparado?: string;
+    reparacion?: string;
+  }[]> {
+    try {
+      const params: Record<string, any> = {};
+      if (clinic) {
+        params.filterByFormula = `{Empresa} = '${clinic}'`;
+      }
+      const records = await fetchAllRecords('Servicios', { ...params, pageSize: 100 });
+      
+      return records.map((r: any) => {
+        const f = r.fields ?? {};
+        
+        // Campo de foto reparado: puede ser adjunto o URL en texto
+        let fotoReparado: string | undefined;
+        const foto = f['Foto reparado'] ?? f['FotoReparado'];
+        if (Array.isArray(foto) && foto.length > 0 && foto[0]?.url) {
+          fotoReparado = foto[0].url;
+        } else if (typeof foto === 'string') {
+          fotoReparado = foto;
+        }
+
+        return {
+          id: r.id,
+          expediente: f['Expediente'],
+          cliente: f['Cliente'],
+          telefono: f['Teléfono'] ?? f['Telefono'],
+          estado: f['Estado'],
+          comentarios: f['Comentarios'],
+          tecnico: f['Técnico'] ?? f['Tecnico'],
+          fotoReparado,
+          reparacion: f['Reparación'] ?? f['Reparacion'],
+        };
+      });
+    } catch (error) {
+      console.error('Error fetching services:', error);
+      return [];
+    }
+  },
+
+  // Obtener técnicos desde Airtable
+  async getTechnicians(): Promise<import('../types').Tecnico[]> {
+    try {
+      const records = await fetchAllRecords('Técnicos', { pageSize: 100 });
+      return records.map((r: any) => {
+        const f = r.fields ?? {};
+        return {
+          id: r.id,
+          nombre: f['Nombre'] ?? f['Name'],
+          provincia: f['Provincia'] ?? f['Province'],
+          estado: f['Estado'] ?? f['Status'],
+          telefono: f['Teléfono'] ?? f['Telefono'] ?? f['Phone'],
+          observaciones: f['Observaciones'] ?? f['Observacion'] ?? f['Notes'],
+        };
+      });
+    } catch (error) {
+      console.error('Error fetching technicians:', error);
+      return [];
+    }
+  },
+
+  // Crear nuevo técnico
+  async createTechnician(technician: Omit<import('../types').Tecnico, 'id'>): Promise<import('../types').Tecnico> {
+    try {
+      const response = await axios.post(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Técnicos`, {
+        records: [{
+          fields: {
+            'Nombre': technician.nombre || '',
+            'Provincia': technician.provincia || '',
+            'Estado': technician.estado || 'Sin contactar',
+            'Teléfono': technician.telefono || '',
+            'Observaciones': technician.observaciones || '',
+          }
+        }]
+      }, {
+        headers: {
+          'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const createdRecord = response.data.records[0];
+      const f = createdRecord.fields;
+      return {
+        id: createdRecord.id,
+        nombre: f['Nombre'],
+        provincia: f['Provincia'],
+        estado: f['Estado'],
+        telefono: f['Teléfono'],
+        observaciones: f['Observaciones'],
+      };
+    } catch (error) {
+      console.error('Error creating technician:', error);
+      throw new Error('Error al crear el técnico');
+    }
+  },
+
   // Obtener recursos (tabla "Recursos")
   async getResources(): Promise<{
     id: string;
     name: string;
     description?: string;
-    type?: string;
     fileUrl?: string;
     fileName?: string;
     imageUrl?: string;
@@ -427,7 +581,6 @@ export const airtableService = {
           id: r.id,
           name: f['Nombre'] ?? f['Name'] ?? 'Recurso',
           description: f['Descripción'] ?? f['Descripcion'] ?? f['Description'],
-          type: f['Tipo'] ?? f['Type'],
           fileUrl: file?.url,
           fileName: file?.filename,
           imageUrl: photo?.url,

@@ -1,3 +1,10 @@
+# CRM Ritest
+
+Este proyecto es un CRM para la empresa Ritest, conectado a Airtable y diseñado para el personal administrativo.
+
+## Características
+
+...
 # Portal Sonrisia - Clínicas Dentales
 
 Portal web profesional para la gestión de clínicas dentales con integración a Airtable.

@@ -5,12 +5,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import Tasks from './pages/Tasks';
-import Invoices from './pages/Invoices';
-import Schedule from './pages/Schedule';
 import Settings from './pages/Settings';
-import Calls from './pages/Calls';
-import Support from './pages/Support';
+import Services from './pages/Services';
+import Technicians from './pages/Technicians';
 import Resources from './pages/Resources';
 
 const queryClient = new QueryClient({
@@ -40,61 +37,21 @@ function App() {
               }
             />
             <Route
-              path="/tasks"
+              path="/services"
               element={
                 <ProtectedRoute>
                   <Layout>
-                    <Tasks />
+                    <Services />
                   </Layout>
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/invoices"
+              path="/technicians"
               element={
                 <ProtectedRoute>
                   <Layout>
-                    <Invoices />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/calls"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Calls />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/schedule"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Schedule />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Settings />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/support"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Support />
+                    <Technicians />
                   </Layout>
                 </ProtectedRoute>
               }
@@ -105,6 +62,16 @@ function App() {
                 <ProtectedRoute>
                   <Layout>
                     <Resources />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Settings />
                   </Layout>
                 </ProtectedRoute>
               }

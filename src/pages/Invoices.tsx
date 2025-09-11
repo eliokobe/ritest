@@ -74,7 +74,7 @@ const Invoices: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0059F1]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-dark"></div>
       </div>
     );
   }
@@ -83,7 +83,7 @@ const Invoices: React.FC = () => {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Facturas</h1>
-        <p className="text-gray-600 mt-2">Facturas emitidas por Sonrisia a tu clínica</p>
+        <p className="text-gray-600 mt-2">Facturas emitidas por Ritest para tu empresa</p>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -135,7 +135,7 @@ const Invoices: React.FC = () => {
                           href={invoice.fileUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center text-[#0059F1] hover:underline"
+                          className="inline-flex items-center text-brand-dark hover:underline"
                         >
                           <Download className="h-4 w-4 mr-1" /> Descargar
                         </a>

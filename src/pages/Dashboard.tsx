@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Phone, Calendar } from 'lucide-react';
+import { Wrench, CheckCircle } from 'lucide-react';
 import { DashboardStats } from '../types';
 import { airtableService } from '../services/airtable';
 
@@ -26,7 +26,7 @@ const Dashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0059F1]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-dark"></div>
       </div>
     );
   }
@@ -41,27 +41,27 @@ const Dashboard: React.FC = () => {
 
   const summaryCards = [
     {
-      title: 'Llamadas (30 días)',
-      value: stats.calls30Days,
-      icon: Phone,
+      title: 'Servicios (30 días)',
+      value: stats.services30Days,
+      icon: Wrench,
       color: 'bg-blue-500',
     },
     {
-      title: 'Llamadas (7 días)',
-      value: stats.calls7Days,
-      icon: Phone,
+      title: 'Servicios (7 días)',
+      value: stats.services7Days,
+      icon: Wrench,
       color: 'bg-green-500',
     },
     {
-      title: 'Citas (30 días)',
-      value: stats.appointments30Days,
-      icon: Calendar,
+      title: 'Completados (30 días)',
+      value: stats.servicesCompleted30Days,
+      icon: CheckCircle,
       color: 'bg-purple-500',
     },
     {
-      title: 'Citas (7 días)',
-      value: stats.appointments7Days,
-      icon: Calendar,
+      title: 'Completados (7 días)',
+      value: stats.servicesCompleted7Days,
+      icon: CheckCircle,
       color: 'bg-orange-500',
     },
   ];
@@ -70,7 +70,7 @@ const Dashboard: React.FC = () => {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-2">Resumen de actividad de tu clínica</p>
+        <p className="text-gray-600 mt-2">Resumen de actividad de servicios técnicos</p>
       </div>
 
       {/* Tarjetas de resumen */}
@@ -113,8 +113,8 @@ const Dashboard: React.FC = () => {
                   month: 'short' 
                 })}
               />
-              <Bar dataKey="calls" fill="#0059F1" name="Llamadas" />
-              <Bar dataKey="appointments" fill="#10B981" name="Citas" />
+              <Bar dataKey="services" fill="#008606" name="Servicios" />
+              <Bar dataKey="completed" fill="#22c55e" name="Completados" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -139,19 +139,19 @@ const Dashboard: React.FC = () => {
               />
               <Line 
                 type="monotone" 
-                dataKey="calls" 
-                stroke="#0059F1" 
+                dataKey="services" 
+                stroke="#008606" 
                 strokeWidth={3}
-                name="Llamadas"
-                dot={{ fill: '#0059F1', strokeWidth: 2, r: 4 }}
+                name="Servicios"
+                dot={{ fill: '#008606', strokeWidth: 2, r: 4 }}
               />
               <Line 
                 type="monotone" 
-                dataKey="appointments" 
-                stroke="#10B981" 
+                dataKey="completed" 
+                stroke="#22c55e" 
                 strokeWidth={3}
-                name="Citas"
-                dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
+                name="Completados"
+                dot={{ fill: '#22c55e', strokeWidth: 2, r: 4 }}
               />
             </LineChart>
           </ResponsiveContainer>

@@ -3,23 +3,29 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import {
   Home,
-  CheckSquare,
-  FileText,
-  Calendar as CalendarIcon,
   Settings,
   LogOut,
   Menu,
   X,
   ChevronLeft,
   ChevronRight,
-  PhoneCall,
-  LifeBuoy,
+  Wrench,
   FileDown,
+  Users,
+  MessageCircle,
+  ExternalLink,
 } from 'lucide-react';
 import { useState } from 'react';
 
 interface LayoutProps {
   children: ReactNode;
+}
+
+interface NavigationItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  external?: boolean;
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
@@ -34,14 +40,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     navigate('/login');
   };
 
-  const navigation = [
+  const navigation: NavigationItem[] = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Tareas', href: '/tasks', icon: CheckSquare },
-    { name: 'Facturas', href: '/invoices', icon: FileText },
-  { name: 'Llamadas', href: '/calls', icon: PhoneCall },
-  { name: 'Agendar Reunión', href: '/schedule', icon: CalendarIcon },
-  { name: 'Soporte', href: '/support', icon: LifeBuoy },
-  { name: 'Recursos', href: '/resources', icon: FileDown },
+    { name: 'Servicios', href: '/services', icon: Wrench },
+    { name: 'Técnicos', href: '/technicians', icon: Users },
+    { name: 'Whatsapp', href: 'https://app.manychat.com/fb3265841/chat', icon: MessageCircle, external: true },
+    { name: 'Ipas', href: 'https://red.ipartner.es/Account/Login?ReturnUrl=%2fenergyefficiencyvisit%2fenergyefficiencyvisit', icon: ExternalLink, external: true },
+    { name: 'Recursos', href: '/resources', icon: FileDown },
     { name: 'Ajustes', href: '/settings', icon: Settings },
   ];
 
@@ -53,7 +58,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white">
           <div className="flex h-16 items-center justify-between px-4 border-b">
             <div className="flex items-center">
-              <img src="/Logo.png" alt="Sonrisia" className="h-8 w-auto" />
+              <img src="/ritest-logo.png" alt="Ritest" className="h-8 w-auto" />
             </div>
             <button onClick={() => setSidebarOpen(false)}>
               <X className="h-6 w-6 text-gray-400" />
@@ -63,6 +68,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             {navigation.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.href;
+              
+              if (item.external) {
+                return (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors text-gray-700 hover:bg-gray-100"
+                  >
+                    <Icon className="h-5 w-5 mr-3" />
+                    {item.name}
+                  </a>
+                );
+              }
+              
               return (
                 <Link
                   key={item.name}
@@ -70,7 +91,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   onClick={() => setSidebarOpen(false)}
                   className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-[#0059F1] text-white'
+                      ? 'bg-brand-primary text-white'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
@@ -97,7 +118,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200">
           <div className={`relative flex items-center h-16 px-4 border-b ${sidebarCollapsed ? 'justify-center' : 'justify-between'}`}>
             {!sidebarCollapsed && (
-              <img src="/Logo.png" alt="Sonrisia" className="h-8 w-auto" />
+              <img src="/ritest-logo.png" alt="Ritest" className="h-8 w-auto" />
             )}
             {!sidebarCollapsed ? (
               <button
@@ -121,13 +142,29 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             {navigation.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.href;
+              
+              if (item.external) {
+                return (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`flex items-center ${sidebarCollapsed ? 'justify-center px-2 py-2' : 'px-3 py-2'} rounded-lg text-sm font-medium transition-colors text-gray-700 hover:bg-gray-100`}
+                  >
+                    <Icon className={`h-5 w-5 ${sidebarCollapsed ? '' : 'mr-3'}`} />
+                    {!sidebarCollapsed && item.name}
+                  </a>
+                );
+              }
+              
               return (
                 <Link
                   key={item.name}
                   to={item.href}
                   className={`flex items-center ${sidebarCollapsed ? 'justify-center px-2 py-2' : 'px-3 py-2'} rounded-lg text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-[#0059F1] text-white'
+                      ? 'bg-brand-primary text-white'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
@@ -189,15 +226,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Contenido principal */}
   <div className={`${sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
         {/* Header móvil */}
-        <div className="lg:hidden flex items-center justify-between h-16 px-4 bg-white border-b">
-          <button onClick={() => setSidebarOpen(true)}>
-            <Menu className="h-6 w-6 text-gray-400" />
-          </button>
-          <div className="flex items-center">
-            <img src="/Logo.png" alt="Sonrisia" className="h-6 w-auto" />
+          <div className="lg:hidden flex items-center justify-between h-16 px-4 bg-white border-b">
+            <button onClick={() => setSidebarOpen(true)}>
+              <Menu className="h-6 w-6 text-gray-400" />
+            </button>
+            <div className="flex items-center">
+              <img src="/ritest-logo.png" alt="Ritest" className="h-6 w-auto" />
+            </div>
+            <div className="w-6" />
           </div>
-          <div className="w-6" />
-        </div>
 
         {/* Contenido */}
         <main className="p-4 lg:p-8">

@@ -78,7 +78,7 @@ const Calls: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0059F1]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-dark"></div>
       </div>
     );
   }
@@ -98,7 +98,7 @@ const Calls: React.FC = () => {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full border border-gray-300 rounded-full px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0059F1]/30"
+              className="w-full border border-gray-300 rounded-full px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-dark/30"
             >
               <option value="">Todos</option>
               {statuses.map(s => (

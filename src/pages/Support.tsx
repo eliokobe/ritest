@@ -77,7 +77,7 @@ const Support: React.FC = () => {
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
                   placeholder="Describe brevemente tu consulta"
-                  className="w-full border border-gray-300 rounded-full px-4 py-2 focus:ring-2 focus:ring-[#0059F1] focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-full px-4 py-2 focus:ring-2 focus:ring-brand-dark focus:border-transparent"
                 />
               </div>
               <div>
@@ -87,7 +87,7 @@ const Support: React.FC = () => {
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Explica detalladamente tu consulta o problema"
                   rows={6}
-                  className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-[#0059F1] focus:border-transparent"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-brand-dark focus:border-transparent"
                 />
               </div>
               <button

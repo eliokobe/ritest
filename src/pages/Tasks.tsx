@@ -94,7 +94,7 @@ const Tasks: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0059F1]"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-dark"></div>
       </div>
     );
   }
@@ -145,7 +145,7 @@ const Tasks: React.FC = () => {
                 <button
                   onClick={() => updateTaskStatus(task.id, task.status)}
                   disabled={updatingTask === task.id}
-                  className="ml-4 bg-[#0059F1] text-white px-5 py-2.5 rounded-full font-medium hover:bg-[#003CB8] focus:ring-2 focus:ring-[#0059F1] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="ml-4 bg-brand-dark text-white px-5 py-2.5 rounded-full font-medium hover:bg-brand-green focus:ring-2 focus:ring-brand-dark focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {updatingTask === task.id ? 'Actualizando...' : 'Actualizar Estado'}
                 </button>

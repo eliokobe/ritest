@@ -29,15 +29,36 @@ export interface Invoice {
   description?: string;       // opcional
 }
 
+export interface Service {
+  id: string;
+  expediente?: string;
+  cliente?: string;
+  telefono?: string;
+  estado?: string;
+  comentarios?: string;
+  tecnico?: string;
+  fotoReparado?: string;
+  reparacion?: string;
+}
+
+export interface Tecnico {
+  id: string;
+  nombre?: string;
+  provincia?: string;
+  estado?: 'Contratado' | 'Contactado' | 'Sin contactar' | 'De baja';
+  telefono?: string;
+  observaciones?: string;
+}
+
 export interface DashboardStats {
-  calls30Days: number;
-  calls7Days: number;
-  appointments30Days: number;
-  appointments7Days: number;
+  services30Days: number;
+  services7Days: number;
+  servicesCompleted30Days: number;
+  servicesCompleted7Days: number;
   dailyData: {
     date: string;
-    calls: number;
-    appointments: number;
+    services: number;
+    completed: number;
   }[];
 }
 

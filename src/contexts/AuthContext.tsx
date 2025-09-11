@@ -22,13 +22,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedUser = Cookies.get('sonrisia_user');
+    const savedUser = Cookies.get('ritest_user');
     if (savedUser) {
       try {
         setUser(JSON.parse(savedUser));
       } catch (error) {
         console.error('Error parsing saved user:', error);
-        Cookies.remove('sonrisia_user');
+        Cookies.remove('ritest_user');
       }
     }
     setLoading(false);
@@ -42,7 +42,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (logo) {
           const updated = { ...user, logoUrl: logo } as User;
           setUser(updated);
-          Cookies.set('sonrisia_user', JSON.stringify(updated), { expires: 7 });
+          Cookies.set('ritest_user', JSON.stringify(updated), { expires: 7 });
         }
       }
     };
@@ -63,7 +63,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }
         }
         setUser(enriched);
-        Cookies.set('sonrisia_user', JSON.stringify(enriched), { expires: 7 });
+        Cookies.set('ritest_user', JSON.stringify(enriched), { expires: 7 });
       } else {
         throw new Error('Credenciales inválidas');
       }
@@ -74,14 +74,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
     setUser(null);
-    Cookies.remove('sonrisia_user');
+    Cookies.remove('ritest_user');
   };
 
   const updateUserContext = (patch: Partial<User>) => {
     setUser((prev) => {
       if (!prev) return prev;
       const next = { ...prev, ...patch } as User;
-      Cookies.set('sonrisia_user', JSON.stringify(next), { expires: 7 });
+      Cookies.set('ritest_user', JSON.stringify(next), { expires: 7 });
       return next;
     });
   };

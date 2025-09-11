@@ -101,7 +101,7 @@ const Schedule: React.FC = () => {
                 min={minDate}
                 max={maxDate}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-full focus:ring-2 focus:ring-[#0059F1] focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-full focus:ring-2 focus:ring-brand-dark focus:border-transparent"
               />
               <p className="text-xs text-gray-500 mt-1">
                 Entre {new Date(minDate).toLocaleDateString('es-ES')} y {new Date(maxDate).toLocaleDateString('es-ES')}
@@ -114,7 +114,7 @@ const Schedule: React.FC = () => {
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-full focus:ring-2 focus:ring-[#0059F1] focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-full focus:ring-2 focus:ring-brand-dark focus:border-transparent"
               />
             </div>
           </div>
@@ -125,7 +125,7 @@ const Schedule: React.FC = () => {
               onChange={(e) => setReason(e.target.value)}
               rows={4}
               placeholder="Escribe brevemente el motivo"
-              className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-[#0059F1] focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-brand-dark focus:border-transparent"
               required
             />
           </div>
@@ -133,7 +133,7 @@ const Schedule: React.FC = () => {
             <button
               type="submit"
               disabled={submitting}
-              className="bg-[#0059F1] text-white px-6 py-3 rounded-full font-medium hover:bg-[#003CB8] focus:ring-2 focus:ring-[#0059F1] focus:ring-offset-2 disabled:opacity-50"
+              className="bg-brand-dark text-white px-6 py-3 rounded-full font-medium hover:bg-brand-green focus:ring-2 focus:ring-brand-dark focus:ring-offset-2 disabled:opacity-50"
             >
               {submitting ? 'Agendando...' : 'Agendar reunión'}
             </button>

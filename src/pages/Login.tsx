@@ -28,11 +28,11 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(120%_120%_at_100%_0%,#0059F1_0%,#ffffff_55%),radial-gradient(120%_120%_at_0%_100%,#0059F1_0%,#ffffff_60%)]">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(120%_120%_at_100%_0%,#008606_0%,#ffffff_55%),radial-gradient(120%_120%_at_0%_100%,#008606_0%,#ffffff_60%)]">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
         <div className="text-center mb-8">
-          <img src="/Logo.png" alt="Logo" className="mx-auto mb-4 w-32 h-auto" />
-          <p className="text-gray-600 mt-2">Portal para Clínicas Dentales</p>
+          <img src="/ritest-logo.png" alt="Ritest" className="mx-auto mb-4 w-32 h-auto" />
+          <p className="text-gray-600 mt-2">Portal para el personal administrativo</p>
         </div>
 
         {error && (
@@ -53,7 +53,7 @@ const Login: React.FC = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-full focus:ring-2 focus:ring-[#0059F1] focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-full focus:ring-2 focus:ring-brand-primary focus:border-transparent"
                 placeholder="email@email.com"
                 required
               />
@@ -71,7 +71,7 @@ const Login: React.FC = () => {
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-full focus:ring-2 focus:ring-[#0059F1] focus:border-transparent"
+                className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-full focus:ring-2 focus:ring-brand-primary focus:border-transparent"
                 placeholder="••••••••"
                 required
               />
@@ -88,7 +88,7 @@ const Login: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#0059F1] text-white py-3 px-4 rounded-full font-medium hover:bg-[#003CB8] focus:ring-2 focus:ring-[#0059F1] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full bg-brand-primary text-white py-3 px-4 rounded-full font-medium hover:bg-brand-green focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </button>
@@ -97,7 +97,7 @@ const Login: React.FC = () => {
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-600">
             ¿Necesitas ayuda?{' '}
-            <a href="mailto:soporte@sonrisia.com" className="text-[#0059F1] hover:underline">
+            <a href="mailto:soporte@ritest.com" className="text-brand-primary hover:underline">
               Contacta soporte
             </a>
           </p>

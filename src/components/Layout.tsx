@@ -14,6 +14,8 @@ import {
   Users,
   MessageCircle,
   ExternalLink,
+  FileText,
+  Database,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -44,6 +46,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Servicios', href: '/services', icon: Wrench },
     { name: 'Técnicos', href: '/technicians', icon: Users },
+    { name: 'Registros', href: '/registros', icon: Database },
+    { name: 'Informe', href: '/informe', icon: FileText, external: true },
     { name: 'Whatsapp', href: 'https://app.manychat.com/fb3265841/chat', icon: MessageCircle, external: true },
     { name: 'Ipas', href: 'https://red.ipartner.es/Account/Login?ReturnUrl=%2fenergyefficiencyvisit%2fenergyefficiencyvisit', icon: ExternalLink, external: true },
     { name: 'Recursos', href: '/resources', icon: FileDown },
@@ -70,10 +74,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               const isActive = location.pathname === item.href;
               
               if (item.external) {
+                const href = item.name === 'Informe' ? `${window.location.origin}${item.href}` : item.href;
                 return (
                   <a
                     key={item.name}
-                    href={item.href}
+                    href={href}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors text-gray-700 hover:bg-gray-100"
@@ -144,10 +149,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               const isActive = location.pathname === item.href;
               
               if (item.external) {
+                const href = item.name === 'Informe' ? `${window.location.origin}${item.href}` : item.href;
                 return (
                   <a
                     key={item.name}
-                    href={item.href}
+                    href={href}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`flex items-center ${sidebarCollapsed ? 'justify-center px-2 py-2' : 'px-3 py-2'} rounded-lg text-sm font-medium transition-colors text-gray-700 hover:bg-gray-100`}

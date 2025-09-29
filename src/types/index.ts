@@ -50,6 +50,17 @@ export interface Tecnico {
   observaciones?: string;
 }
 
+export interface Registro {
+  id: string;
+  contrato?: number;
+  nombre?: string;
+  telefono?: string;
+  direccion?: string;
+  email?: string;
+  estado?: string;
+  fecha?: string; // ISO string with datetime
+}
+
 export interface DashboardStats {
   services30Days: number;
   services7Days: number;

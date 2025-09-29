@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios';
-import { User, DashboardStats } from '../types';
+import { User, DashboardStats, Registro } from '../types';
 
 // Base ID fijo (no es secreto). Si se define VITE_AIRTABLE_BASE_ID la sobreescribe.
 const AIRTABLE_BASE_ID = import.meta.env.VITE_AIRTABLE_BASE_ID || 'appRMClMob8KPNooU';
@@ -25,12 +25,35 @@ const airtableApi = axios.create({
   },
 });
 
+// Segunda base de Airtable para Registros
+const REGISTROS_BASE_ID = 'applcT2fcdNDpCRQ0';
+const registrosApi = axios.create({
+  baseURL: `https://api.airtable.com/v0/${REGISTROS_BASE_ID}`,
+  headers: {
+    'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+    'Content-Type': 'application/json',
+  },
+});
+
 // Helper para paginar Airtable
 async function fetchAllRecords(table: string, params: Record<string, any> = {}) {
   const all: any[] = [];
   let offset: string | undefined;
   do {
     const { data } = await airtableApi.get(`/${table}`, { params: { ...params, offset } });
+    const airtableData = data as { records?: any[]; offset?: string };
+    all.push(...(airtableData.records ?? []));
+    offset = airtableData.offset;
+  } while (offset);
+  return all;
+}
+
+// Helper para paginar Airtable de la segunda base (Registros)
+async function fetchAllRegistros(table: string, params: Record<string, any> = {}) {
+  const all: any[] = [];
+  let offset: string | undefined;
+  do {
+    const { data } = await registrosApi.get(`/${table}`, { params: { ...params, offset } });
     const airtableData = data as { records?: any[]; offset?: string };
     all.push(...(airtableData.records ?? []));
     offset = airtableData.offset;
@@ -549,6 +572,93 @@ export const airtableService = {
     } catch (error) {
       console.error('Error fetching resources:', error);
       return [];
+    }
+  },
+
+  // Obtener registros (segunda base de Airtable)
+  async getRegistros(): Promise<Registro[]> {
+    try {
+      const records = await fetchAllRegistros('Registros', { pageSize: 100 });
+      return records.map((r: any) => {
+        const f = r.fields ?? {};
+        return {
+          id: r.id,
+          contrato: f['Contrato'],
+          nombre: f['Nombre'],
+          telefono: f['Teléfono'] ?? f['Telefono'],
+          direccion: f['Dirección'] ?? f['Direccion'],
+          email: f['Email'],
+          estado: f['Estado'],
+          fecha: f['Fecha'] ? new Date(f['Fecha']).toISOString() : undefined,
+        };
+      });
+    } catch (error) {
+      console.error('Error fetching registros:', error);
+      return [];
+    }
+  },
+
+  // Crear nuevo registro
+  async createRegistro(registro: Omit<Registro, 'id'>): Promise<Registro> {
+    try {
+      const response = await registrosApi.post('/Registros', {
+        records: [{
+          fields: {
+            'Contrato': registro.contrato,
+            'Nombre': registro.nombre || '',
+            'Teléfono': registro.telefono || '',
+            'Dirección': registro.direccion || '',
+            'Email': registro.email || '',
+            'Estado': registro.estado || '',
+            'Fecha': registro.fecha ? new Date(registro.fecha).toISOString() : new Date().toISOString(),
+          }
+        }]
+      });
+
+      const createdRecord = response.data.records[0];
+      const f = createdRecord.fields;
+      return {
+        id: createdRecord.id,
+        contrato: f['Contrato'],
+        nombre: f['Nombre'],
+        telefono: f['Teléfono'],
+        direccion: f['Dirección'],
+        email: f['Email'],
+        estado: f['Estado'],
+        fecha: f['Fecha'] ? new Date(f['Fecha']).toISOString() : undefined,
+      };
+    } catch (error) {
+      console.error('Error creating registro:', error);
+      throw new Error('Error al crear el registro');
+    }
+  },
+
+  // Actualizar registro
+  async updateRegistro(registroId: string, updates: Partial<Omit<Registro, 'id'>>): Promise<void> {
+    try {
+      const fields: Record<string, any> = {};
+      if (updates.contrato !== undefined) fields['Contrato'] = updates.contrato;
+      if (updates.nombre !== undefined) fields['Nombre'] = updates.nombre;
+      if (updates.telefono !== undefined) fields['Teléfono'] = updates.telefono;
+      if (updates.direccion !== undefined) fields['Dirección'] = updates.direccion;
+      if (updates.email !== undefined) fields['Email'] = updates.email;
+      if (updates.estado !== undefined) fields['Estado'] = updates.estado;
+      if (updates.fecha !== undefined) fields['Fecha'] = new Date(updates.fecha).toISOString();
+
+      await registrosApi.patch(`/Registros/${registroId}`, { fields });
+    } catch (error) {
+      console.error('Error updating registro:', error);
+      throw error;
+    }
+  },
+
+  // Eliminar registro
+  async deleteRegistro(registroId: string): Promise<void> {
+    try {
+      await registrosApi.delete(`/Registros/${registroId}`);
+    } catch (error) {
+      console.error('Error deleting registro:', error);
+      throw error;
     }
   },
 };

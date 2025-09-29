@@ -9,6 +9,8 @@ import Settings from './pages/Settings';
 import Services from './pages/Services';
 import Technicians from './pages/Technicians';
 import Resources from './pages/Resources';
+import Informe from './pages/Informe';
+import Registros from './pages/Registros';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -62,6 +64,26 @@ function App() {
                 <ProtectedRoute>
                   <Layout>
                     <Resources />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/informe"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Informe />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/registros"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Registros />
                   </Layout>
                 </ProtectedRoute>
               }

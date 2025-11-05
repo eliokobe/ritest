@@ -34,6 +34,7 @@ interface Service {
   notaTecnico?: string;
   citaTecnico?: string;
   chatbot?: string;
+  fechaInstalacion?: string;
 }
 
 // Filtros permitidos para todos los usuarios (estados que se muestran en la tabla)
@@ -691,6 +692,10 @@ const Services: React.FC = () => {
                 <div>
                   <p className="text-xs uppercase text-gray-500">Último cambio</p>
                   <p className="text-sm text-gray-900 mt-1">{renderDetailValue(formatDate(selectedService.ultimoCambio))}</p>
+                </div>
+                <div>
+                  <p className="text-xs uppercase text-gray-500">Fecha instalación</p>
+                  <p className="text-sm text-gray-900 mt-1">{renderDetailValue(formatDate(selectedService.fechaInstalacion))}</p>
                 </div>
               </div>
 
@@ -1435,15 +1440,15 @@ const Services: React.FC = () => {
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <h3 className="text-sm font-semibold text-gray-700">Problema</h3>
+                  <h3 className="text-sm font-semibold text-gray-700">Detalles</h3>
                   <button
-                    onClick={() => handleEdit(selectedReparacion.id, 'problema-rep', selectedReparacion.problema || '')}
+                    onClick={() => handleEdit(selectedReparacion.id, 'detalles-rep', selectedReparacion.detalles || '')}
                     className="text-xs text-brand-primary hover:text-brand-green"
                   >
                     Editar
                   </button>
                 </div>
-                {editingField?.id === selectedReparacion.id && editingField?.field === 'problema-rep' ? (
+                {editingField?.id === selectedReparacion.id && editingField?.field === 'detalles-rep' ? (
                   <div className="space-y-2">
                     <textarea
                       value={editValue}
@@ -1454,7 +1459,7 @@ const Services: React.FC = () => {
                       autoFocus
                     />
                     <div className="flex gap-2">
-                      <button onClick={() => handleSaveReparacion(selectedReparacion.id, 'Problema')} disabled={saving} className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700">
+                      <button onClick={() => handleSaveReparacion(selectedReparacion.id, 'Detalles')} disabled={saving} className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700">
                         Guardar
                       </button>
                       <button onClick={handleCancel} disabled={saving} className="px-3 py-1 bg-gray-200 text-gray-700 text-xs rounded hover:bg-gray-300">
@@ -1463,7 +1468,7 @@ const Services: React.FC = () => {
                     </div>
                   </div>
                 ) : (
-                  <p className="mt-1 text-sm text-gray-900 whitespace-pre-line">{renderDetailValue(selectedReparacion.problema)}</p>
+                  <p className="mt-1 text-sm text-gray-900 whitespace-pre-line">{renderDetailValue(selectedReparacion.detalles)}</p>
                 )}
               </div>
 

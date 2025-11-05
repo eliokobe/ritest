@@ -501,6 +501,7 @@ export const airtableService = {
     fechaRegistro?: string;
     ultimoCambio?: string;
     chatbot?: string;
+    fechaInstalacion?: string;
   }[]> {
     try {
       const params: Record<string, any> = {};
@@ -573,6 +574,7 @@ export const airtableService = {
           fechaRegistro: f['Fecha de registro'] ?? f['Fecha'] ?? f['Created'] ?? r.createdTime,
           ultimoCambio: f['Último cambio'] ?? f['Ultima modificacion'] ?? f['Last Modified'] ?? f['Modified'] ?? r.createdTime,
           chatbot: f['Chatbot'],
+          fechaInstalacion: f['Fecha instalación'] ?? f['Fecha instalacion'] ?? f['Installation Date'],
         };
       });
 
@@ -888,7 +890,7 @@ export const airtableService = {
         resultado: f['Resultado'] ?? f['Result'],
         reparacion: f['Reparación'] ?? f['Repair'],
         cuadroElectrico: f['Cuadro eléctrico'] ?? f['Electrical Panel'],
-        problema: f['Problema'] ?? f['Problem'],
+        detalles: f['Detalles'] ?? f['Details'] ?? f['Descripción'],
         foto: f['Foto'] ?? f['Photo'],
       };
     } catch (error) {
@@ -950,7 +952,7 @@ export const airtableService = {
         'resultado': 'Resultado',
         'reparacion': 'Reparación',
         'cuadroElectrico': 'Cuadro eléctrico',
-        'problema-rep': 'Problema',
+        'detalles-rep': 'Detalles',
       };
       
       const airtableField = fieldMap[field] || field;

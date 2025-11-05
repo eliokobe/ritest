@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
-import { Search, Info, X, Check, XCircle, Eye, FileText, Wrench, Phone, ArrowUp } from 'lucide-react';
+import { Search, Info, X, Check, XCircle, Eye, FileText, Wrench, Phone, ArrowUp, Upload } from 'lucide-react';
 import { airtableService } from '../services/airtable';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -92,6 +92,7 @@ const Services: React.FC = () => {
   const [editingField, setEditingField] = useState<{ id: string; field: string } | null>(null);
   const [editValue, setEditValue] = useState('');
   const [saving, setSaving] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState<string | null>(null);
 
   // Determinar si el usuario es Gestora Operativa
   const isGestoraOperativa = user?.role === 'Gestora Operativa';
@@ -278,6 +279,54 @@ const Services: React.FC = () => {
       alert('Error al guardar los cambios');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handlePhotoUpload = async (formId: string, photoField: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validar que sea una imagen
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor selecciona un archivo de imagen válido');
+      return;
+    }
+
+    // Validar tamaño (máximo 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      alert('El archivo es demasiado grande. Máximo 10MB');
+      return;
+    }
+
+    setUploadingPhoto(photoField);
+
+    try {
+      // Convertir archivo a base64 para enviarlo a Airtable
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const base64String = reader.result as string;
+          
+          // Airtable requiere que se suba el archivo primero a un servidor público
+          // y luego usar la URL. Por simplicidad, vamos a usar el mismo approach
+          // que Airtable recomienda: subir a través de su API con URL públicas.
+          // En este caso, deberías implementar tu propio servicio de subida de archivos
+          // o usar un servicio como Cloudinary, AWS S3, etc.
+          
+          alert('Para subir fotos, necesitas implementar un servicio de almacenamiento de archivos (ej: Cloudinary, AWS S3). Por ahora, puedes usar la funcionalidad de descarga de fotos existentes.');
+          
+        } catch (error) {
+          console.error('Error uploading photo:', error);
+          alert('Error al subir la foto');
+        } finally {
+          setUploadingPhoto(null);
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('Error reading file:', error);
+      alert('Error al leer el archivo');
+      setUploadingPhoto(null);
     }
   };
 
@@ -881,40 +930,7 @@ const Services: React.FC = () => {
               </div>
 
               <div className="space-y-4">
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="text-sm font-semibold text-gray-700">Problema</h3>
-                    <button
-                      onClick={() => handleEdit(selectedFormulario.id, 'problema', selectedFormulario.Problema || '')}
-                      className="text-xs text-brand-primary hover:text-brand-green"
-                    >
-                      Editar
-                    </button>
-                  </div>
-                  {editingField?.id === selectedFormulario.id && editingField?.field === 'problema' ? (
-                    <div className="space-y-2">
-                      <textarea
-                        value={editValue}
-                        onChange={(e) => setEditValue(e.target.value)}
-                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent text-sm"
-                        rows={3}
-                        disabled={saving}
-                        autoFocus
-                      />
-                      <div className="flex gap-2">
-                        <button onClick={() => handleSaveFormulario(selectedFormulario.id, 'Problema')} disabled={saving} className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700">
-                          Guardar
-                        </button>
-                        <button onClick={handleCancel} disabled={saving} className="px-3 py-1 bg-gray-200 text-gray-700 text-xs rounded hover:bg-gray-300">
-                          Cancelar
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="mt-1 text-sm text-gray-900 whitespace-pre-line">{renderDetailValue(selectedFormulario.Problema)}</p>
-                  )}
-                </div>
-
+                {/* Detalles */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <h3 className="text-sm font-semibold text-gray-700">Detalles</h3>
@@ -946,6 +962,76 @@ const Services: React.FC = () => {
                     </div>
                   ) : (
                     <p className="mt-1 text-sm text-gray-900 whitespace-pre-line">{renderDetailValue(selectedFormulario.Detalles)}</p>
+                  )}
+                </div>
+
+                {/* Potencia contratada */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="text-sm font-semibold text-gray-700">Potencia contratada</h3>
+                    <button
+                      onClick={() => handleEdit(selectedFormulario.id, 'potenciaContratada', selectedFormulario['Potencia contratada'] || '')}
+                      className="text-xs text-brand-primary hover:text-brand-green"
+                    >
+                      Editar
+                    </button>
+                  </div>
+                  {editingField?.id === selectedFormulario.id && editingField?.field === 'potenciaContratada' ? (
+                    <div className="space-y-2">
+                      <input
+                        type="text"
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent text-sm"
+                        disabled={saving}
+                        autoFocus
+                      />
+                      <div className="flex gap-2">
+                        <button onClick={() => handleSaveFormulario(selectedFormulario.id, 'Potencia contratada')} disabled={saving} className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700">
+                          Guardar
+                        </button>
+                        <button onClick={handleCancel} disabled={saving} className="px-3 py-1 bg-gray-200 text-gray-700 text-xs rounded hover:bg-gray-300">
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="mt-1 text-sm text-gray-900">{renderDetailValue(selectedFormulario['Potencia contratada'])}</p>
+                  )}
+                </div>
+
+                {/* Fecha instalación */}
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="text-sm font-semibold text-gray-700">Fecha instalación</h3>
+                    <button
+                      onClick={() => handleEdit(selectedFormulario.id, 'fechaInstalacion', selectedFormulario['Fecha instalación'] || '')}
+                      className="text-xs text-brand-primary hover:text-brand-green"
+                    >
+                      Editar
+                    </button>
+                  </div>
+                  {editingField?.id === selectedFormulario.id && editingField?.field === 'fechaInstalacion' ? (
+                    <div className="space-y-2">
+                      <input
+                        type="date"
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent text-sm"
+                        disabled={saving}
+                        autoFocus
+                      />
+                      <div className="flex gap-2">
+                        <button onClick={() => handleSaveFormulario(selectedFormulario.id, 'Fecha instalación')} disabled={saving} className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700">
+                          Guardar
+                        </button>
+                        <button onClick={handleCancel} disabled={saving} className="px-3 py-1 bg-gray-200 text-gray-700 text-xs rounded hover:bg-gray-300">
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="mt-1 text-sm text-gray-900">{renderDetailValue(selectedFormulario['Fecha instalación'])}</p>
                   )}
                 </div>
 
@@ -1007,10 +1093,22 @@ const Services: React.FC = () => {
                 {/* Fotos */}
                 <div className="border-t pt-4">
                   <h3 className="text-sm font-semibold text-gray-700 mb-3">Fotos</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Foto general */}
                     <div>
-                      <h4 className="text-xs font-medium text-gray-600 mb-2">Foto general</h4>
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-xs font-medium text-gray-600">Foto general</h4>
+                        <label className="cursor-pointer text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => handlePhotoUpload(selectedFormulario.id, 'fotoGeneral', e)}
+                            disabled={uploadingPhoto !== null}
+                          />
+                          {uploadingPhoto === 'fotoGeneral' ? 'Subiendo...' : 'Adjuntar'}
+                        </label>
+                      </div>
                       {selectedFormulario['Foto general'] && Array.isArray(selectedFormulario['Foto general']) && selectedFormulario['Foto general'].length > 0 ? (
                         <div className="space-y-2">
                           {selectedFormulario['Foto general'].map((file: AirtableAttachment, idx: number) => (
@@ -1040,7 +1138,19 @@ const Services: React.FC = () => {
 
                     {/* Foto etiqueta */}
                     <div>
-                      <h4 className="text-xs font-medium text-gray-600 mb-2">Foto etiqueta</h4>
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-xs font-medium text-gray-600">Foto etiqueta</h4>
+                        <label className="cursor-pointer text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => handlePhotoUpload(selectedFormulario.id, 'fotoEtiqueta', e)}
+                            disabled={uploadingPhoto !== null}
+                          />
+                          {uploadingPhoto === 'fotoEtiqueta' ? 'Subiendo...' : 'Adjuntar'}
+                        </label>
+                      </div>
                       {selectedFormulario['Foto etiqueta'] && Array.isArray(selectedFormulario['Foto etiqueta']) && selectedFormulario['Foto etiqueta'].length > 0 ? (
                         <div className="space-y-2">
                           {selectedFormulario['Foto etiqueta'].map((file: AirtableAttachment, idx: number) => (
@@ -1070,7 +1180,19 @@ const Services: React.FC = () => {
 
                     {/* Foto roto */}
                     <div>
-                      <h4 className="text-xs font-medium text-gray-600 mb-2">Foto roto</h4>
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-xs font-medium text-gray-600">Foto roto</h4>
+                        <label className="cursor-pointer text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => handlePhotoUpload(selectedFormulario.id, 'fotoRoto', e)}
+                            disabled={uploadingPhoto !== null}
+                          />
+                          {uploadingPhoto === 'fotoRoto' ? 'Subiendo...' : 'Adjuntar'}
+                        </label>
+                      </div>
                       {selectedFormulario['Foto roto'] && Array.isArray(selectedFormulario['Foto roto']) && selectedFormulario['Foto roto'].length > 0 ? (
                         <div className="space-y-2">
                           {selectedFormulario['Foto roto'].map((file: AirtableAttachment, idx: number) => (
@@ -1087,6 +1209,48 @@ const Services: React.FC = () => {
                                 <img
                                   src={file.thumbnails.large.url}
                                   alt="Foto roto"
+                                  className="w-full h-auto object-cover rounded border"
+                                />
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-500">Sin foto</p>
+                      )}
+                    </div>
+
+                    {/* Foto cuadro */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-xs font-medium text-gray-600">Foto cuadro</h4>
+                        <label className="cursor-pointer text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => handlePhotoUpload(selectedFormulario.id, 'fotoCuadro', e)}
+                            disabled={uploadingPhoto !== null}
+                          />
+                          {uploadingPhoto === 'fotoCuadro' ? 'Subiendo...' : 'Adjuntar'}
+                        </label>
+                      </div>
+                      {selectedFormulario['Foto cuadro'] && Array.isArray(selectedFormulario['Foto cuadro']) && selectedFormulario['Foto cuadro'].length > 0 ? (
+                        <div className="space-y-2">
+                          {selectedFormulario['Foto cuadro'].map((file: AirtableAttachment, idx: number) => (
+                            <div key={idx} className="space-y-1">
+                              <a
+                                href={file.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-blue-600 hover:underline block"
+                              >
+                                Descargar
+                              </a>
+                              {file.thumbnails?.large?.url && (
+                                <img
+                                  src={file.thumbnails.large.url}
+                                  alt="Foto cuadro"
                                   className="w-full h-auto object-cover rounded border"
                                 />
                               )}

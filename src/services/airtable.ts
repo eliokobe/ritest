@@ -847,14 +847,16 @@ export const airtableService = {
       return {
         id: r.id,
         Expediente: f['Expediente'],
-        Problema: f['Problema'] ?? f['Problem'],
         Detalles: f['Detalles'] ?? f['Details'] ?? f['Descripción'],
+        'Potencia contratada': f['Potencia contratada'] ?? f['Contracted Power'],
+        'Fecha instalación': f['Fecha instalación'] ?? f['Installation Date'],
         'Archivo 1': f['Archivo 1'] ?? f['File 1'],
         'Archivo 2': f['Archivo 2'] ?? f['File 2'],
         'Archivo 3': f['Archivo 3'] ?? f['File 3'],
         'Foto general': f['Foto general'] ?? f['General Photo'],
         'Foto etiqueta': f['Foto etiqueta'] ?? f['Label Photo'],
         'Foto roto': f['Foto roto'] ?? f['Broken Photo'],
+        'Foto cuadro': f['Foto cuadro'] ?? f['Panel Photo'],
       };
     } catch (error) {
       console.error('Error fetching formulario:', error);
@@ -899,8 +901,9 @@ export const airtableService = {
   async updateFormularioField(formId: string, field: string, value: string): Promise<void> {
     try {
       const fieldMap: Record<string, string> = {
-        'problema': 'Problema',
         'detalles': 'Detalles',
+        'potenciaContratada': 'Potencia contratada',
+        'fechaInstalacion': 'Fecha instalación',
       };
       
       const airtableField = fieldMap[field] || field;
@@ -912,6 +915,29 @@ export const airtableService = {
       });
     } catch (error) {
       console.error(`Error updating formulario field ${field}:`, error);
+      throw error;
+    }
+  },
+
+  // Subir foto a formulario (campo de attachments)
+  async uploadFormularioPhoto(formId: string, photoField: string, fileUrl: string): Promise<void> {
+    try {
+      const fieldMap: Record<string, string> = {
+        'fotoGeneral': 'Foto general',
+        'fotoEtiqueta': 'Foto etiqueta',
+        'fotoRoto': 'Foto roto',
+        'fotoCuadro': 'Foto cuadro',
+      };
+      
+      const airtableField = fieldMap[photoField] || photoField;
+      
+      await serviciosApi.patch(`/Formularios/${formId}`, {
+        fields: {
+          [airtableField]: [{ url: fileUrl }],
+        },
+      });
+    } catch (error) {
+      console.error(`Error uploading photo to ${photoField}:`, error);
       throw error;
     }
   },
